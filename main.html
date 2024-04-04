@@ -1,143 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formulário de Envio</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    
-    form {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
-    
-    input[type="text"], select, button {
-        margin-bottom: 10px;
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 16px;
-    }
-    
-    button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-    
-    button:hover {
-        background-color: #45a049;
-    }
-
-    .list-container {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordem de Produção</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <form id="myForm">
-        <input type="text" name="data" placeholder="Digite seus dados aqui">
-        <select name="tipo" id="selectOptions">
-            <!-- Options will be dynamically added here -->
-        </select>
-        <button type="submit">Enviar</button>
-    </form>
-
-    <div class="list-container" id="listContainer">
-        <!-- List items will be dynamically added here -->
+    <div class="container">
+        <h1>Criar Ordem de Produção</h1>
+        <div class="form">
+            <label for="nome_produto">Nome do Produto:</label>
+            <input type="text" id="nome_produto">
+            <label for="quantidade">Quantidade:</label>
+            <input type="number" id="quantidade">
+            <button onclick="adicionarProduto()">Adicionar Produto</button>
+        </div>
+        <div class="lista-produtos" id="lista_produtos"></div>
+        <button onclick="criarOrdem()">Criar Ordem de Produção</button>
     </div>
-
-    <script>
-        // Function to fetch options for select element
-        function fetchOptions() {
-            fetch("https://seu-endpoint.com/get-options", {
-                method: "GET"
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Erro ao buscar opções");
-                }
-                return response.json();
-            })
-            .then(data => {
-                const selectElement = document.getElementById("selectOptions");
-                data.forEach(option => {
-                    const optionElement = document.createElement("option");
-                    optionElement.value = option.value;
-                    optionElement.textContent = option.label;
-                    selectElement.appendChild(optionElement);
-                });
-            })
-            .catch(error => {
-                console.error("Erro:", error);
-            });
-        }
-
-        // Call the function to fetch options when the page loads
-        fetchOptions();
-
-        // Event listener for form submission
-        document.getElementById("myForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const formData = new FormData(this);
-            const jsonData = {};
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
-            });
-            const endpoint = "https://seu-endpoint.com/aqui";
-            fetch(endpoint, {
-                method: "POST",
-                body: JSON.stringify(jsonData),
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Erro ao enviar dados");
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Dados enviados com sucesso:", data);
-                updateList(data); // Update the list with the received data
-            })
-            .catch(error => {
-                console.error("Erro:", error);
-            });
-        });
-
-        // Function to update the list with received data
-        function updateList(data) {
-            const listContainer = document.getElementById("listContainer");
-            listContainer.innerHTML = ""; // Clear previous content
-            const ul = document.createElement("ul");
-            data.forEach(item => {
-                const li = document.createElement("li");
-                li.textContent = item;
-                ul.appendChild(li);
-            });
-            listContainer.appendChild(ul);
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
