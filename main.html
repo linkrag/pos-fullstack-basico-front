@@ -16,8 +16,44 @@
             <input type="number" id="quantidade">
             <button onclick="adicionarProduto()">Adicionar Produto</button>
         </div>
-        <div class="lista-produtos" id="lista_produtos"></div>
-        <button onclick="criarOrdem()">Criar Ordem de Produção</button>
+        <hr>
+        <h3>Produtos Inseridos:</h3>
+        <table class="table" id="produtoTable">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Quantidade</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="produtoList">
+            </tbody>
+        </table>
+        <hr>
+        <button type="submit" class="btn btn-primary" id="createOrder">Criar Ordem de Produção</button>
+    </div>
+    </div>
+    <div class="container consultar-ordem-container">
+        <h1>Consultar Ordem de Produção</h1>
+        <div class="form">
+            <label for="id_ordem">N° da ordem de produção</label>
+            <input type="number" id="id_ordem">
+            <button onclick="consultarOrdem()">Consultar</button>
+        </div>
+        <h3>Ordens de produção</h3>
+        <table class="table" id="ordensTable">
+            <thead>
+                <tr>
+                    <th>N° Ordem</th>
+                    <th>Nome</th>
+                    <th>Quantidade</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody id="ordensList">
+            </tbody>
+        </table>
+        <hr>
     </div>
     <script src="script.js"></script>
 </body>

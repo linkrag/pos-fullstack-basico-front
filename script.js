@@ -21,14 +21,32 @@ function adicionarProduto() {
 }
 
 function atualizarListaProdutos() {
-    const listaProdutosDiv = document.getElementById('lista_produtos');
-    listaProdutosDiv.innerHTML = '';
+    const listaProdutosTbody = document.getElementById('produtoList');
+    listaProdutosTbody.innerHTML = '';
 
     produtos.forEach(produto => {
-        const produtoDiv = document.createElement('div');
-        produtoDiv.textContent = `Nome: ${produto.nome}, Quantidade: ${produto.quantidade}`;
-        listaProdutosDiv.appendChild(produtoDiv);
+        const row = listaProdutosTbody.insertRow();
+        const cell1 = row.insertCell(0);
+        const cell2 = row.insertCell(1);
+        const cell3 = row.insertCell(2);
+
+        cell1.textContent = produto.nome;
+        cell2.textContent = produto.quantidade;
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Remover';
+        deleteButton.classList.add('delete-btn');
+        deleteButton.addEventListener('click', () => removerProduto(produto));
+        cell3.appendChild(deleteButton);
     });
+}
+
+function removerProduto(produto) {
+    const index = produtos.indexOf(produto);
+    if (index !== -1) {
+        produtos.splice(index, 1);
+        atualizarListaProdutos();
+    }
 }
 
 function limparCampos() {
@@ -68,4 +86,51 @@ function criarOrdem() {
         console.error('Erro:', error);
         alert('Erro ao criar ordem de produção');
     });
+}
+
+function consultarOrdem() {
+    fetch('http://localhost:5000/ordem')
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao consultar ordens de produção');
+        })
+        .then(data => {
+            atualizarTabelaOrdens(data);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao consultar ordens de produção');
+        });
+}
+
+function atualizarTabelaOrdens(ordens) {
+    const ordensListTbody = document.getElementById('ordensList');
+    ordensListTbody.innerHTML = '';
+
+    ordens.forEach(ordem => {
+        ordem.produtos.forEach(produto => {
+            const row = ordensListTbody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+
+            cell1.textContent = ordem.id;
+            cell2.textContent = produto.nome;
+            cell3.textContent = produto.quantidade;
+
+            const consultarButton = document.createElement('button');
+            consultarButton.textContent = 'Consultar';
+            consultarButton.classList.add('consultar-btn');
+            consultarButton.addEventListener('click', () => consultarOrdemPorId(ordem.id));
+            cell4.appendChild(consultarButton);
+        });
+    });
+}
+
+function consultarOrdemPorId(id) {
+    // Implemente a lógica para consultar uma ordem específica por ID, se necessário
+    // Pode ser feita uma nova solicitação HTTP GET ou manipulação dos dados existentes
 }

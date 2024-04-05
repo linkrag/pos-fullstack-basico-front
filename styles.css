@@ -52,3 +52,11 @@ button:hover {
 .lista-produtos {
     margin-bottom: 20px;
 }
+
+.delete-btn {
+    background-color: #ff3333;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
