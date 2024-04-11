@@ -71,25 +71,33 @@ function criarOrdem() {
         },
         body: JSON.stringify(data)
     })
-    .then(response => {
-        if (response.ok) {
-            return response.json();
-        }
-        throw new Error('Erro ao criar ordem de produção');
-    })
-    .then(data => {
-        alert('Ordem de produção criada com sucesso! ID da ordem: ' + data.ordem_id);
-        produtos = [];
-        atualizarListaProdutos();
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao criar ordem de produção');
-    });
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao criar ordem de produção');
+        })
+        .then(data => {
+            alert('Ordem de produção criada com sucesso! ID da ordem: ' + data.id);
+            produtos = [];
+            atualizarListaProdutos();
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao criar ordem de produção');
+        });
 }
 
 function consultarOrdem() {
-    fetch('http://localhost:5000/ordem')
+    let url = 'http://localhost:5000/ordem'
+
+    if (document.getElementById('id_ordem').value != 0 && document.getElementById('id_ordem').value != undefined) {
+        url += '/' + document.getElementById('id_ordem').value;
+    } else {
+        url += '/0';
+    }
+
+    fetch(url)
         .then(response => {
             if (response.ok) {
                 return response.json();
@@ -105,27 +113,29 @@ function consultarOrdem() {
         });
 }
 
-function atualizarTabelaOrdens(ordens) {
+function atualizarTabelaOrdens(dados) {
     const ordensListTbody = document.getElementById('ordensList');
     ordensListTbody.innerHTML = '';
 
-    ordens.forEach(ordem => {
+    dados.ordens.forEach(ordem => {
         ordem.produtos.forEach(produto => {
             const row = ordensListTbody.insertRow();
             const cell1 = row.insertCell(0);
             const cell2 = row.insertCell(1);
             const cell3 = row.insertCell(2);
             const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
 
             cell1.textContent = ordem.id;
             cell2.textContent = produto.nome;
             cell3.textContent = produto.quantidade;
+            cell4.textContent = ordem.data_criacao;
 
             const consultarButton = document.createElement('button');
             consultarButton.textContent = 'Consultar';
             consultarButton.classList.add('consultar-btn');
             consultarButton.addEventListener('click', () => consultarOrdemPorId(ordem.id));
-            cell4.appendChild(consultarButton);
+            cell5.appendChild(consultarButton);
         });
     });
 }
