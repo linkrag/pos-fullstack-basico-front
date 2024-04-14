@@ -79,8 +79,59 @@ function criarOrdem() {
         })
         .then(data => {
             alert('Ordem de produção criada com sucesso! ID da ordem: ' + data.id);
+            document.getElementById('id_ordem').value = data.id
             produtos = [];
             atualizarListaProdutos();
+            consultarOrdem()
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao criar ordem de produção');
+        });
+}
+
+function inserirObservacao() {
+    const numOrdem = document.getElementById('numOrdem').value;
+    const obs = document.getElementById('obs').value;
+
+    
+    
+    if (numOrdem.value != 0 && numOrdem.value != undefined) {
+        alert('Nenhum número de ordem foi inserido.');
+        return;
+    }
+    
+    if (obs.value != '' && obs.value != undefined) {
+        alert('Nenhum texto foi inserido.');
+        return;
+    }
+    
+    const data = {
+        numOrdem: numOrdem,
+        texto: obs
+    };
+    
+    console.log(data)
+
+    fetch('http://localhost:5000/obs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao criar ordem de produção');
+        })
+        .then(data => {
+            alert('Observação inserida com sucesso');
+            document.getElementById('id_ordem').value = numOrdem
+            produtos = [];
+            atualizarListaProdutos();
+            consultarOrdem()
         })
         .catch(error => {
             console.error('Erro:', error);
@@ -106,6 +157,7 @@ function consultarOrdem() {
         })
         .then(data => {
             atualizarTabelaOrdens(data);
+            atualizarTabelaObs(data);
         })
         .catch(error => {
             console.error('Erro:', error);
@@ -140,7 +192,86 @@ function atualizarTabelaOrdens(dados) {
     });
 }
 
+function deleteObs(id) {
+
+    fetch('http://localhost:5000/obs/' + id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao deletar observação');
+        })
+        .then(data => {
+            alert('Observação deletada com sucesso');
+            produtos = [];
+            atualizarListaProdutos();
+            consultarOrdem()
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao deletar observação');
+        });
+}
+
+function atualizarTabelaOrdens(dados) {
+    const ordensListTbody = document.getElementById('ordensList');
+    ordensListTbody.innerHTML = '';
+
+    dados.ordens.forEach(ordem => {
+        ordem.produtos.forEach(produto => {
+            const row = ordensListTbody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+            const cell5 = row.insertCell(4);
+
+            cell1.textContent = ordem.id;
+            cell2.textContent = produto.nome;
+            cell3.textContent = produto.quantidade;
+            cell4.textContent = ordem.data_criacao;
+
+            const consultarButton = document.createElement('button');
+            consultarButton.textContent = 'Consultar';
+            consultarButton.classList.add('consultar-btn');
+            consultarButton.addEventListener('click', () => consultarOrdemPorId(ordem.id));
+            cell5.appendChild(consultarButton);
+        });
+    });
+}
+
+function atualizarTabelaObs(dados) {
+    const obsListTbody = document.getElementById('obsList');
+    obsListTbody.innerHTML = '';
+
+    dados.ordens.forEach(ordem => {
+        ordem.obs.forEach(obs => {
+            const row = obsListTbody.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+
+            cell1.textContent = ordem.id;
+            cell2.textContent = obs.id;
+            cell2.hidden = true;
+            cell3.textContent = obs.texto;
+
+            const consultarButton = document.createElement('button');
+            consultarButton.textContent = 'Deletar';
+            consultarButton.classList.add('deletar-obs-btn');
+            consultarButton.addEventListener('click', () => deleteObs(obs.id));
+            cell4.appendChild(consultarButton);
+        });
+    });
+}
+
 function consultarOrdemPorId(id) {
-    // Implemente a lógica para consultar uma ordem específica por ID, se necessário
-    // Pode ser feita uma nova solicitação HTTP GET ou manipulação dos dados existentes
+    document.getElementById('id_ordem').value = id
+    consultarOrdem();
 }

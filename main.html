@@ -56,6 +56,29 @@
         </table>
         <hr>
     </div>
+    <div class="container observações">
+        <h1>Observações da Ordem de Produção</h1>
+        <div class="form">
+            <label for="numOrdem">N° da Ordem:</label>
+            <input type="number" id="numOrdem">
+            <label for="obs">Observação:</label>
+            <input type="text" id="obs">
+            <button onclick="inserirObservacao()">Inserir</button>
+        </div>
+        <h3>Observações</h3>
+        <table class="table" id="obsTable">
+            <thead>
+                <tr>
+                    <th>N° Ordem</th>
+                    <th hidden="true">ID</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody id="obsList">
+            </tbody>
+        </table>
+        <hr>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
