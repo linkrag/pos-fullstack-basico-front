@@ -1,3 +1,10 @@
+const obsTextArea = document.getElementById('obs');
+
+obsTextArea.addEventListener('input', function () {
+    this.style.height = 'auto'; // Redefine a altura para automático
+    this.style.height = this.scrollHeight + 'px'; // Define a altura baseada no conteúdo
+});
+
 let produtos = [];
 
 function adicionarProduto() {
@@ -31,6 +38,7 @@ function atualizarListaProdutos() {
         const cell3 = row.insertCell(2);
 
         cell1.textContent = produto.nome;
+        cell1.classList.add('td_text')
         cell2.textContent = produto.quantidade;
 
         const deleteButton = document.createElement('button');
@@ -79,56 +87,7 @@ function criarOrdem() {
         })
         .then(data => {
             alert('Ordem de produção criada com sucesso! ID da ordem: ' + data.id);
-            document.getElementById('id_ordem').value = data.id
-            produtos = [];
-            atualizarListaProdutos();
-            consultarOrdem()
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao criar ordem de produção');
-        });
-}
-
-function inserirObservacao() {
-    const numOrdem = document.getElementById('numOrdem').value;
-    const obs = document.getElementById('obs').value;
-
-    
-    
-    if (numOrdem.value != 0 && numOrdem.value != undefined) {
-        alert('Nenhum número de ordem foi inserido.');
-        return;
-    }
-    
-    if (obs.value != '' && obs.value != undefined) {
-        alert('Nenhum texto foi inserido.');
-        return;
-    }
-    
-    const data = {
-        numOrdem: numOrdem,
-        texto: obs
-    };
-    
-    console.log(data)
-
-    fetch('http://localhost:5000/obs', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error('Erro ao criar ordem de produção');
-        })
-        .then(data => {
-            alert('Observação inserida com sucesso');
-            document.getElementById('id_ordem').value = numOrdem
+            document.getElementById('numOrdem').value = data.id
             produtos = [];
             atualizarListaProdutos();
             consultarOrdem()
@@ -141,9 +100,10 @@ function inserirObservacao() {
 
 function consultarOrdem() {
     let url = 'http://localhost:5000/ordem'
+    const numOrdem = document.getElementById('numOrdem').value;
 
-    if (document.getElementById('id_ordem').value != 0 && document.getElementById('id_ordem').value != undefined) {
-        url += '/' + document.getElementById('id_ordem').value;
+    if (numOrdem != 0 && numOrdem != undefined) {
+        url += '/' + numOrdem;
     } else {
         url += '/0';
     }
@@ -192,6 +152,54 @@ function atualizarTabelaOrdens(dados) {
     });
 }
 
+function inserirObservacao() {
+    const numOrdem = document.getElementById('numOrdem').value;
+    const obs = document.getElementById('obs').value;
+
+    if (numOrdem.value != 0 && numOrdem.value != undefined) {
+        alert('Nenhum número de ordem foi inserido.');
+        return;
+    }
+
+    if (obs.value != '' && obs.value != undefined) {
+        alert('Nenhum texto foi inserido.');
+        return;
+    }
+
+    const data = {
+        ordem_id: numOrdem,
+        texto: obs
+    };
+
+    console.log(data)
+
+    fetch('http://localhost:5000/obs', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao criar ordem de produção');
+        })
+        .then(data => {
+            alert('Observação inserida com sucesso');
+            document.getElementById('numOrdem').value = numOrdem
+            produtos = [];
+            atualizarListaProdutos();
+            consultarOrdem()
+            document.getElementById('obs').value = '';
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao criar ordem de produção');
+        });
+}
+
 function deleteObs(id) {
 
     fetch('http://localhost:5000/obs/' + id, {
@@ -211,6 +219,36 @@ function deleteObs(id) {
             produtos = [];
             atualizarListaProdutos();
             consultarOrdem()
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao deletar observação');
+        });
+}
+
+
+function deleteOrdem() {
+
+    const id = document.getElementById('numOrdem').value
+
+    fetch('http://localhost:5000/ordem/' + id, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    })
+        .then(response => {
+            console.log(response)
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao deletar observação');
+        })
+        .then(data => {
+            alert('Observação deletada com sucesso');
+            produtos = [];
+            document.getElementById('numOrdem').value = '';
+            consultarOrdem();
         })
         .catch(error => {
             console.error('Erro:', error);
@@ -261,10 +299,11 @@ function atualizarTabelaObs(dados) {
             cell2.textContent = obs.id;
             cell2.hidden = true;
             cell3.textContent = obs.texto;
+            cell3.classList.add('td_text')
 
             const consultarButton = document.createElement('button');
             consultarButton.textContent = 'Deletar';
-            consultarButton.classList.add('deletar-obs-btn');
+            consultarButton.classList.add('delete-btn');
             consultarButton.addEventListener('click', () => deleteObs(obs.id));
             cell4.appendChild(consultarButton);
         });
@@ -272,6 +311,6 @@ function atualizarTabelaObs(dados) {
 }
 
 function consultarOrdemPorId(id) {
-    document.getElementById('id_ordem').value = id
+    document.getElementById('numOrdem').value = id
     consultarOrdem();
 }
